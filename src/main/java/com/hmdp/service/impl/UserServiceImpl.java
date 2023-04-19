@@ -59,7 +59,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (RegexUtils.isCodeInvalid(code)) {
             return Result.fail("验证码格式错误！");
         }
-        if (cacheCode.toString().equals(code)) {
+        if (!cacheCode.toString().equals(code)) {
             //4. 验证码跟session不一致，报错
             return Result.fail("验证码错误");
         }
@@ -70,13 +70,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             user = createUserWithPhone(phone);
         }
         session.setAttribute("user", user);
-        return null;
+        return Result.ok();
     }
 
     private User createUserWithPhone(String phone) {
         User user = new User();
         user.setPhone(phone);
         user.setNickName(USER_NICK_NAME_PREFIX + RandomUtil.randomString(10));
+        save(user);
         return user;
     }
 }
