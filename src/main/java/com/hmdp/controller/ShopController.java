@@ -8,6 +8,7 @@ import com.hmdp.entity.Shop;
 import com.hmdp.service.IShopService;
 import com.hmdp.utils.SystemConstants;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -63,6 +64,7 @@ public class ShopController {
      * @return 无
      */
     @PutMapping
+    @Transactional
     public Result updateShop(@RequestBody Shop shop) {
         // 写入数据库
         shopService.updateById(shop);
