@@ -7,9 +7,12 @@ import com.hmdp.dto.Result;
 import com.hmdp.entity.Shop;
 import com.hmdp.service.IShopService;
 import com.hmdp.utils.SystemConstants;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+
+import static com.hmdp.utils.RedisConstants.CACHE_SHOP_KEY;
 
 /**
  * <p>
@@ -25,6 +28,9 @@ public class ShopController {
 
     @Resource
     public IShopService shopService;
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     /**
      * 根据id查询商铺信息
@@ -45,6 +51,8 @@ public class ShopController {
     public Result saveShop(@RequestBody Shop shop) {
         // 写入数据库
         shopService.save(shop);
+        //删除缓存
+        stringRedisTemplate.delete(CACHE_SHOP_KEY + shop.getId());
         // 返回店铺id
         return Result.ok(shop.getId());
     }
