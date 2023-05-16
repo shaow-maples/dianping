@@ -1,5 +1,6 @@
 package com.hmdp.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
 import com.hmdp.dto.Result;
 import com.hmdp.entity.ShopType;
@@ -43,15 +44,13 @@ public class ShopTypeServiceImpl extends ServiceImpl<ShopTypeMapper, ShopType> i
         }
         //3. 若不存在，查询数据库
         List<ShopType> shopTypeList = query().orderByAsc("sort").list();
-        //4. 如果不存在，返回错误
-        if (Objects.isNull(shopTypeList)) {
+        //4. 如果数据库不存在，返回错误
+        if (CollUtil.isEmpty(shopTypeList)) {
             return Result.fail("分类不存在");
         }
         //5. 数据库能查询到的话，先存入Redis
-        if (!Objects.isNull(shopTypeList)) {
-            stringRedisTemplate.opsForValue().set(CACHE_SHOP_TYPE_KEY, JSONUtil.toJsonStr(shopTypeList), RedisConstants.CACHE_SHOP_TYPE_TTL, TimeUnit.MINUTES);
-        }
-        //5. 返回数据
+        stringRedisTemplate.opsForValue().set(CACHE_SHOP_TYPE_KEY, JSONUtil.toJsonStr(shopTypeList), RedisConstants.CACHE_SHOP_TYPE_TTL, TimeUnit.MINUTES);
+        //6. 返回数据
         return Result.ok(shopTypeList);
     }
 }
