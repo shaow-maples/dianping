@@ -35,22 +35,22 @@ public class ShopTypeServiceImpl extends ServiceImpl<ShopTypeMapper, ShopType> i
 
     @Override
     public Result queryTypeList() {
-        //1. 查询Redis
+        // 1. 查询Redis
         String shopType = stringRedisTemplate.opsForValue().get(CACHE_SHOP_TYPE_KEY);
         if (StringUtils.hasText(shopType)) {
-            //2. 若存在，直接返回
+            // 2. 若存在，直接返回
             List<ShopType> shopTypes = JSONUtil.toList(shopType, ShopType.class);
             return Result.ok(shopTypes);
         }
-        //3. 若不存在，查询数据库
+        // 3. 若不存在，查询数据库
         List<ShopType> shopTypeList = query().orderByAsc("sort").list();
-        //4. 如果数据库不存在，返回错误
+        // 4. 如果数据库不存在，返回错误
         if (CollUtil.isEmpty(shopTypeList)) {
             return Result.fail("分类不存在");
         }
-        //5. 数据库能查询到的话，先存入Redis
+        // 5. 数据库能查询到的话，先存入Redis
         stringRedisTemplate.opsForValue().set(CACHE_SHOP_TYPE_KEY, JSONUtil.toJsonStr(shopTypeList), RedisConstants.CACHE_SHOP_TYPE_TTL, TimeUnit.MINUTES);
-        //6. 返回数据
+        // 6. 返回数据
         return Result.ok(shopTypeList);
     }
 }
